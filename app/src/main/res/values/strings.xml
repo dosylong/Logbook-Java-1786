@@ -1,3 +1,25 @@
 <resources>
     <string name="app_name">DesignInputScreen</string>
+
+    <string-array name="property">
+        <item>Flat</item>
+        <item>House</item>
+        <item>Bungalow</item>
+    </string-array>
+
+    <string-array name="bedroom">
+        <item>One</item>
+        <item>Two</item>
+        <item>Three</item>
+        <item>Studio</item>
+    </string-array>
+
+    <string-array name="furniture">
+        <item>Furnished</item>
+        <item>Unfurnished</item>
+        <item>Part Furnished</item>
+    </string-array>
+
+    <string name="err_msg">required!</string>
+
 </resources>

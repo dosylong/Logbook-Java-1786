@@ -4,6 +4,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
@@ -12,6 +14,8 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -20,7 +24,7 @@ import com.google.android.material.textfield.TextInputLayout;
 import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity {
-    private TextInputLayout textMonthlyRentPrice, textNotes, textNameReporter;
+    private EditText textMonthlyRentPrice, textNotes, textNameReporter;
     private Button BtnConfirm, dateButton;
     private DatePickerDialog datePickerDialog;
     String[] items_property = {"Flat", "House", "Bungalow"};
@@ -71,8 +75,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 },year,month,day);
 
-                //Disable past date
-                datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis()-1000);
+                //Disable future date
                 datePickerDialog.getDatePicker().setMaxDate(System.currentTimeMillis());
 
                 //Show date picker dialog
@@ -114,16 +117,79 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+//        Spinner property = (Spinner) findViewById(R.id.property);
+//        ArrayAdapter<String> propertyArr = new ArrayAdapter<String>(MainActivity.this,
+//                android.R.layout.simple_list_item_1,
+//                getResources().getStringArray(R.array.property));
+//        propertyArr.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+//        property.setAdapter(propertyArr);
 
+        BtnConfirm.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this, android.R.style.Theme_DeviceDefault_Dialog);
+                builder.setTitle("Confirmation?");
+                builder.setMessage("Property: " + autoCompleteTextView_Property.getText().toString() + "\n" +
+                        "Bedroom: " + autoCompleteTextView_Bedroom.getText().toString() + "\n" +
+                        "Price: " + textMonthlyRentPrice.getText().toString() + "\n" +
+                        "Date: " + SelectedDate.getText().toString() + "\n" +
+                        "Furniture: " + autoCompleteTextView_Furniture.getText().toString() + "\n" +
+                        "Note: " + textNotes.getText().toString() + "\n" +
+                        "Name: " + textNameReporter.getText().toString());
+                builder.setIcon(R.drawable.ic_launcher_foreground);
+                builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        confirmInput(view);
+                    }
+                });
+                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                    }
+                });
+                builder.show();
+            }
+        });
+
+
+    }
+
+    private boolean validateProperty() {
+        String val = autoCompleteTextView_Property.getText().toString();
+        if(val.isEmpty()){
+            autoCompleteTextView_Property.setError(getString(R.string.err_msg));
+            Toast.makeText(this, "Property can not be empty", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        else{
+            autoCompleteTextView_Property.setError(null);
+            return true;
+        }
+    }
+
+    private boolean validateBedroom() {
+        String val = autoCompleteTextView_Bedroom.getText().toString();
+        if(val.isEmpty()){
+            autoCompleteTextView_Bedroom.setError("Bedroom can not be empty!");
+//            Toast.makeText(this, "Bedroom can not be empty", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        else{
+            autoCompleteTextView_Bedroom.setError(null);
+            return true;
+        }
     }
 
     private boolean validateDateAndMonth(){
         String val = SelectedDate.getText().toString().trim();
 
-        if (val.isEmpty()){
+        if (val.length() == 0){
             SelectedDate.setError("");
-            SelectedDate.setText("Field can not be empty!");
-            SelectedDate.setTextColor(Color.RED);
+//            SelectedDate.setText("Field can not be empty!");
+            Toast.makeText(this, "Date can not be empty!", Toast.LENGTH_SHORT).show();
+//            SelectedDate.setTextColor(Color.RED);
             return false;
         }
         else {
@@ -133,34 +199,45 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private boolean validateMonthlyRentPrice(){
-        String val = textMonthlyRentPrice.getEditText().getText().toString().trim();
+        String val = textMonthlyRentPrice.getText().toString().trim();
 
-        if (val.isEmpty()){
-            textMonthlyRentPrice.setError("Field can not be empty!");
+        if (val.length() == 0){
+            textMonthlyRentPrice.setError("Price can not be empty!");
+//            Toast.makeText(this, "Price can not be empty!", Toast.LENGTH_SHORT).show();
             return false;
         }
         else {
             textMonthlyRentPrice.setError(null);
+
             return true;
         }
     }
 
-    private boolean validateNameOfTheReporter(){
-        String val = textNameReporter.getEditText().getText().toString().trim();
 
-        if (val.isEmpty()){
-            textNameReporter.setError("Field can not be empty!");
+
+    private boolean validateNameOfTheReporter(){
+        String val = textNameReporter.getText().toString().trim();
+
+        if (val.length() == 0){
+            textNameReporter.setError("Name can not be empty!");
+//            Toast.makeText(this, "Name can not be empty!", Toast.LENGTH_SHORT).show();
             return false;
         }
         else {
             textNameReporter.setError(null);
+
             return true;
         }
     }
 
 
     public void confirmInput(View v){
-        if (!validateDateAndMonth() && !validateMonthlyRentPrice() && !validateNameOfTheReporter())
+        if (!validateProperty()
+                && !validateBedroom()
+                && !validateDateAndMonth()
+                && !validateMonthlyRentPrice()
+                && !validateNameOfTheReporter()
+        )
         {
             return;
         }
